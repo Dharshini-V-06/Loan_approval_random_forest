@@ -1,0 +1,13 @@
+prefix=D:/Loan_approval_random_forest/random_forest/Library
+exec_prefix=D:/Loan_approval_random_forest/random_forest/Library
+libdir=D:/Loan_approval_random_forest/random_forest/Library/lib
+sharedlibdir=D:/Loan_approval_random_forest/random_forest/Library/lib
+includedir=D:/Loan_approval_random_forest/random_forest/Library/include
+
+Name: zlib
+Description: zlib compression library
+Version: 1.3.1
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -lz
+Cflags: -I${includedir}
