@@ -3,25 +3,30 @@ import pandas as pd
 import numpy as np
 import pickle
 
-# ----------------------------
-# Load the trained model
-# ----------------------------
+# ------------------------------------------------
+# Load model, encoder, and category mappings
+# ------------------------------------------------
 with open('loan_approval.pkl', 'rb') as f:
     le, model = pickle.load(f)
 
-# ----------------------------
-# Streamlit UI
-# ----------------------------
+# If you also saved category mappings, uncomment this:
+# le, model, categories = pickle.load(f)
+
+# ------------------------------------------------
+# Streamlit UI Setup
+# ------------------------------------------------
 st.set_page_config(page_title="Loan Approval Prediction", page_icon="💰")
 st.title("🏦 Loan Approval Prediction App")
 st.write("Enter applicant details below to predict loan approval status.")
 
-# Collect user inputs
+# ------------------------------------------------
+# Input Fields
+# ------------------------------------------------
 person_age = st.number_input("Person Age", min_value=18, max_value=80, value=25)
 person_gender = st.selectbox("Gender", ['male', 'female'])
-person_education = st.selectbox("Education", ['High School', 'Bachelor', 'Master', 'Doctorate', 'Professional'])
-person_income = st.number_input("Annual Income ($)", min_value=5000, max_value=10000000, value=50000)
-person_emp_exp = st.number_input("Employment Experience (years)", min_value=0, max_value=60, value=2)
+person_education = st.selectbox("Education", ['High School', 'Associate', 'Bachelor', 'Master', 'Doctorate'])
+person_income = st.number_input("Annual Income ($)", min_value=8000, max_value=10000000, value=60000)
+person_emp_exp = st.number_input("Employment Experience (years)", min_value=0, max_value=60, value=3)
 person_home_ownership = st.selectbox("Home Ownership", ['RENT', 'OWN', 'MORTGAGE', 'OTHER'])
 loan_amnt = st.number_input("Loan Amount ($)", min_value=500, max_value=35000, value=5000)
 loan_intent = st.selectbox("Loan Intent", ['PERSONAL', 'EDUCATION', 'MEDICAL', 'VENTURE', 'HOMEIMPROVEMENT', 'DEBTCONSOLIDATION'])
@@ -31,9 +36,9 @@ cb_person_cred_hist_length = st.number_input("Credit History Length (years)", mi
 credit_score = st.number_input("Credit Score", min_value=300, max_value=850, value=650)
 previous_loan_defaults_on_file = st.selectbox("Previous Loan Defaults", ['No', 'Yes'])
 
-# ----------------------------
-# Prepare input for prediction
-# ----------------------------
+# ------------------------------------------------
+# Prepare input data for model
+# ------------------------------------------------
 input_data = pd.DataFrame({
     'person_age': [person_age],
     'person_gender': [person_gender],
@@ -50,14 +55,16 @@ input_data = pd.DataFrame({
     'previous_loan_defaults_on_file': [previous_loan_defaults_on_file]
 })
 
-# Encode categorical columns
+# ------------------------------------------------
+# Encode categorical variables
+# ------------------------------------------------
 cat_cols = ['person_gender', 'person_education', 'person_home_ownership', 'loan_intent', 'previous_loan_defaults_on_file']
 for col in cat_cols:
     input_data[col] = le.fit_transform(input_data[col].astype(str))
 
-# ----------------------------
-# Predict
-# ----------------------------
+# ------------------------------------------------
+# Make prediction
+# ------------------------------------------------
 if st.button("🔍 Predict Loan Status"):
     prediction = model.predict(input_data)[0]
     probability = model.predict_proba(input_data)[0][1]
@@ -70,5 +77,8 @@ if st.button("🔍 Predict Loan Status"):
 
     st.info("Model used: Random Forest Classifier")
 
+# ------------------------------------------------
+# Footer
+# ------------------------------------------------
 st.markdown("---")
 st.caption("Built with ❤️ using Streamlit & Machine Learning")
